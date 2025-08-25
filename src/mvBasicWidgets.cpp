@@ -6,6 +6,7 @@
 #include "mvItemHandlers.h"
 #include <misc/cpp/imgui_stdlib.h>
 #include "mvTextureItems.h"
+#include "mvItemRegistry.h"
 
 static bool KnobFloat(const char* label, float* p_value, float v_min, float v_max, float v_step = 50.f);
 
@@ -6413,7 +6414,25 @@ DearPyGui::draw_tooltip(ImDrawList* drawlist, mvAppItem& item)
 {
 	mvTooltip* tooltip = (mvTooltip*)&item;
 	// TODO: Check if this can be done with a way easier ImGui::SetItemTooltip()  (and check "ImGui::BeginItemTooltip()")
-	if (ImGui::IsItemHovered() && item.config.show)
+	
+	// Check if we should use parent's hover state instead of generic hover detection
+	bool shouldShow = false;
+	if (item.config.parent != 0) {
+		// Get parent item to check if it's a plot axis
+		mvAppItem* parent = GetItem(*GContext->itemRegistry, item.config.parent);
+		if (parent && parent->type == mvAppItemType::mvPlotAxis) {
+			// For plot axes, use the parent's correctly calculated hover state
+			shouldShow = parent->state.hovered && item.config.show;
+		} else {
+			// For other items, use the generic hover detection
+			shouldShow = ImGui::IsItemHovered() && item.config.show;
+		}
+	} else {
+		// No parent, use generic hover detection
+		shouldShow = ImGui::IsItemHovered() && item.config.show;
+	}
+	
+	if (shouldShow)
 	{
 		ImVec2 mousePos = ImGui::GetMousePos();
 

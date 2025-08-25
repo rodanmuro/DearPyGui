@@ -717,7 +717,7 @@ DearPyGui::draw_plot_axis(ImDrawList* drawlist, mvAppItem& item, mvPlotAxisConfi
 
 	config.flags = ImPlot::GetCurrentContext()->CurrentPlot->Axes[config.axis].Flags;
 
-	UpdateAppItemState(item.state);
+	UpdatePlotAxisState(item.state, config.axis);
 
 	if (item.font)
 		ImGui::PopFont();

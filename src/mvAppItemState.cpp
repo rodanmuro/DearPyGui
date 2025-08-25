@@ -1,5 +1,6 @@
 #include "mvAppItemState.h"
 #include <imgui.h>
+#include <implot.h>
 #include "mvAppItem.h"
 #include "mvContext.h"
 #include "mvPyUtils.h"
@@ -28,6 +29,45 @@ UpdateAppItemState(mvAppItemState& state)
 {
     state.lastFrameUpdate = GContext->frame;
     state.hovered = ImGui::IsItemHovered();
+    state.active = ImGui::IsItemActive();
+    state.focused = ImGui::IsItemFocused();
+    if (state.focused)
+    {
+        GContext->focusedItem = state.parent->uuid;
+    }
+    state.leftclicked = ImGui::IsItemClicked();
+    state.rightclicked = ImGui::IsItemClicked(1);
+    state.middleclicked = ImGui::IsItemClicked(2);
+    for (int i = 0; i < state.doubleclicked.size(); i++)
+    {
+        state.doubleclicked[i] = IsItemDoubleClicked(i);
+    }
+    state.visible = ImGui::IsItemVisible();
+    state.edited = ImGui::IsItemEdited();
+    state.activated = ImGui::IsItemActivated();
+    state.deactivated = ImGui::IsItemDeactivated();
+    state.deactivatedAfterEdit = ImGui::IsItemDeactivatedAfterEdit();
+    state.toggledOpen = ImGui::IsItemToggledOpen();
+    state.rectMin = { ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y };
+    state.rectMax = { ImGui::GetItemRectMax().x, ImGui::GetItemRectMax().y };
+    state.rectSize = { ImGui::GetItemRectSize().x, ImGui::GetItemRectSize().y };
+    state.contextRegionAvail = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
+
+    if (state.mvPrevRectSize.x != state.rectSize.x || state.mvPrevRectSize.y != state.rectSize.y) { state.mvRectSizeResized = true; }
+    else state.mvRectSizeResized = false;
+    state.mvPrevRectSize = state.rectSize;
+}
+
+void
+UpdatePlotAxisState(mvAppItemState& state, int axisId)
+{
+    state.lastFrameUpdate = GContext->frame;
+    
+    // Use ImPlot::IsAxisHovered for axis-specific hover detection
+    state.hovered = ImPlot::IsAxisHovered(axisId);
+    
+    // For other states, we use standard ImGui functions since axes don't have
+    // special active/focused/clicked behavior in ImPlot
     state.active = ImGui::IsItemActive();
     state.focused = ImGui::IsItemFocused();
     if (state.focused)

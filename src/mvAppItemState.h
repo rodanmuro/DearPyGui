@@ -42,6 +42,7 @@ enum mvStateItems
 void FillAppItemState  (PyObject* dict, mvAppItemState& state, i32 applicableState); // fills python dict with applicable state values
 void ResetAppItemState (mvAppItemState& state);                                      // reset values to false
 void UpdateAppItemState(mvAppItemState& state);                                      // standard imgui update
+void UpdatePlotAxisState(mvAppItemState& state, int axisId);                         // specialized update for plot axes
 
 // return actual value if frame is active
 b8 IsItemHovered             (mvAppItemState& state, i32 frameDelay = 0);
