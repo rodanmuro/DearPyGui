@@ -4327,3 +4327,39 @@ get_platform(PyObject* self, PyObject* args, PyObject* kwargs)
 	return ToPyInt(2L);
 #endif
 }
+
+static PyObject*
+set_style_colors_light(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["set_style_colors_light"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
+	SetStyleColorsLight();
+
+	return GetPyNone();
+}
+
+static PyObject*
+set_style_colors_dark(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["set_style_colors_dark"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
+	SetStyleColorsDark();
+
+	return GetPyNone();
+}
+
+static PyObject*
+toggle_style_colors(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["toggle_style_colors"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
+	ToggleStyleColors();
+
+	return GetPyNone();
+}

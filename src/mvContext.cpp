@@ -158,6 +158,31 @@ SetDefaultTheme()
 }
 
 void 
+SetStyleColorsLight()
+{
+    ImGui::StyleColorsLight();
+    SetDefaultTheme();
+    GContext->useDefaultDarkTheme = false;
+}
+
+void 
+SetStyleColorsDark()
+{
+    ImGui::StyleColorsDark();
+    SetDefaultTheme();
+    GContext->useDefaultDarkTheme = true;
+}
+
+void 
+ToggleStyleColors()
+{
+    if (GContext->useDefaultDarkTheme)
+        SetStyleColorsLight();
+    else
+        SetStyleColorsDark();
+}
+
+void 
 Render()
 {
 
@@ -183,7 +208,10 @@ Render()
         std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
         if (GContext->resetTheme)
         {
-            SetDefaultTheme();
+            if (GContext->useDefaultDarkTheme)
+                SetStyleColorsDark();
+            else
+                SetStyleColorsLight();
             GContext->resetTheme = false;
         }
 

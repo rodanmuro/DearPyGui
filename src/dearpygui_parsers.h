@@ -1967,4 +1967,40 @@ InsertParser_Block4(std::map<std::string, mvPythonParser>& parsers)
 		mvPythonParser parser = FinalizeParser(setup, args);
 		parsers.insert({ "get_platform", parser });
 	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Sets the ImGui style to light mode and applies DearPyGui default theme.";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::None;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "set_style_colors_light", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Sets the ImGui style to dark mode and applies DearPyGui default theme.";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::None;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "set_style_colors_dark", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Toggles between light and dark mode styles and applies DearPyGui default theme.";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::None;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "toggle_style_colors", parser });
+	}
 }

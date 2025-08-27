@@ -433,8 +433,7 @@ mvShowViewport(mvViewport& viewport, bool minimized, bool maximized)
     io.ConfigDockingWithShift = GContext->IO.dockingShiftOnly;
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-	SetDefaultTheme();
+	SetStyleColorsDark();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplWin32_Init(viewportData->handle);

@@ -32,6 +32,9 @@ extern mvContext* GContext;
 
 mvUUID                                 GenerateUUID();
 void                                   SetDefaultTheme();
+void                                   SetStyleColorsLight();
+void                                   SetStyleColorsDark();
+void                                   ToggleStyleColors();
 void                                   Render();
 std::map<std::string, mvPythonParser>& GetParsers();
 
@@ -112,6 +115,7 @@ struct mvContext
     mvViewport*         viewport = nullptr;
     mvGraphics          graphics;
     bool                resetTheme = false;
+    bool                useDefaultDarkTheme = true;
     mvIO                IO;
     mvItemRegistry*     itemRegistry = nullptr;
     mvCallbackRegistry* callbackRegistry = nullptr;

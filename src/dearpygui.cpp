@@ -588,6 +588,9 @@ PyInit__dearpygui(void)
 
 	// themes
 	MV_ADD_COMMAND(bind_theme);
+	MV_ADD_COMMAND(set_style_colors_light);
+	MV_ADD_COMMAND(set_style_colors_dark);
+	MV_ADD_COMMAND(toggle_style_colors);
 
 	// tools
 	MV_ADD_COMMAND(show_tool);
