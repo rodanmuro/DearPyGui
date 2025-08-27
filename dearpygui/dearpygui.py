@@ -7857,6 +7857,33 @@ def bind_theme(theme : Union[int, str], **kwargs) -> None:
 
 	return internal_dpg.bind_theme(theme, **kwargs)
 
+def set_style_colors_light(**kwargs) -> None:
+	"""	 Sets the ImGui style to light mode and applies DearPyGui default theme.
+
+	Returns:
+		None
+	"""
+
+	return internal_dpg.set_style_colors_light(**kwargs)
+
+def set_style_colors_dark(**kwargs) -> None:
+	"""	 Sets the ImGui style to dark mode and applies DearPyGui default theme.
+
+	Returns:
+		None
+	"""
+
+	return internal_dpg.set_style_colors_dark(**kwargs)
+
+def toggle_style_colors(**kwargs) -> None:
+	"""	 Toggles between light and dark mode styles and applies DearPyGui default theme.
+
+	Returns:
+		None
+	"""
+
+	return internal_dpg.toggle_style_colors(**kwargs)
+
 def capture_next_item(callback : Callable, *, user_data: Any =None, **kwargs) -> None:
 	"""	 Captures the next item.
 

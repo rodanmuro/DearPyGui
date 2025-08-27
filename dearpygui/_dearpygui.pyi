@@ -659,6 +659,18 @@ def bind_theme(theme : Union[int, str]) -> None:
 	"""Binds a global theme."""
 	...
 
+def set_style_colors_light() -> None:
+	"""Sets the ImGui style to light mode and applies DearPyGui default theme."""
+	...
+
+def set_style_colors_dark() -> None:
+	"""Sets the ImGui style to dark mode and applies DearPyGui default theme."""
+	...
+
+def toggle_style_colors() -> None:
+	"""Toggles between light and dark mode styles and applies DearPyGui default theme."""
+	...
+
 def capture_next_item(callback : Callable, *, user_data: Any ='') -> None:
 	"""Captures the next item."""
 	...

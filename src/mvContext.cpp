@@ -160,22 +160,31 @@ SetDefaultTheme()
 void 
 SetStyleColorsLight()
 {
+    if (GContext == nullptr)
+        return;
+        
     ImGui::StyleColorsLight();
-    SetDefaultTheme();
+    // Don't call SetDefaultTheme() - it overrides ImGui theme colors
     GContext->useDefaultDarkTheme = false;
 }
 
 void 
 SetStyleColorsDark()
 {
+    if (GContext == nullptr)
+        return;
+        
     ImGui::StyleColorsDark();
-    SetDefaultTheme();
+    // Don't call SetDefaultTheme() - it overrides ImGui theme colors  
     GContext->useDefaultDarkTheme = true;
 }
 
 void 
 ToggleStyleColors()
 {
+    if (GContext == nullptr)
+        return;
+        
     if (GContext->useDefaultDarkTheme)
         SetStyleColorsLight();
     else

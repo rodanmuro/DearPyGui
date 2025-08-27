@@ -115,7 +115,7 @@ struct mvContext
     mvViewport*         viewport = nullptr;
     mvGraphics          graphics;
     bool                resetTheme = false;
-    bool                useDefaultDarkTheme = true;
+    bool                useDefaultDarkTheme = false;  // Default to light theme
     mvIO                IO;
     mvItemRegistry*     itemRegistry = nullptr;
     mvCallbackRegistry* callbackRegistry = nullptr;

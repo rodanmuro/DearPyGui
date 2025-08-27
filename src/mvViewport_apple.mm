@@ -125,8 +125,11 @@ mvShowViewport(mvViewport& viewport, bool minimized, bool maximized)
 
     io.ConfigDockingWithShift = GContext->IO.dockingShiftOnly;
 
-    // Setup style
-    SetStyleColorsDark();
+    // Setup style - use user preference
+    if (GContext->useDefaultDarkTheme)
+        SetStyleColorsDark();
+    else
+        SetStyleColorsLight();
 
     ImGui_ImplGlfw_InitForOpenGL(viewportData->handle, true);
 
