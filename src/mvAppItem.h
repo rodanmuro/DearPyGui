@@ -122,6 +122,7 @@ struct mvAppItemConfig
     float       indent = -1.0f;
     float       trackOffset = 0.5f; // 0.0f:top, 0.5f:center, 1.0f:bottom
     bool        show             = true;
+    bool        implot_show      = true;  // Tracks ImPlot internal visibility state for series
     bool        enabled          = true;
     bool        searchLast       = false;
     bool        searchDelayed    = false;

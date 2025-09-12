@@ -127,7 +127,7 @@ int BinarySearch(const T* arr, int l, int r, T x) {
 static void
 PlotCandlestick(const char* label_id, const double* xs, const double* opens,
 	const double* closes, const double* lows, const double* highs, int count,
-	bool tooltip, float width_percent, const ImVec4& bullCol, const ImVec4& bearCol, int time_unit)
+	bool tooltip, float width_percent, const ImVec4& bullCol, const ImVec4& bearCol, int time_unit, mvAppItem& item)
 {
 
 	ImDrawList* draw_list = ImPlot::GetPlotDrawList();
@@ -215,6 +215,12 @@ PlotCandlestick(const char* label_id, const double* xs, const double* opens,
 			ImU32 color = ImGui::GetColorU32(opens[i] > closes[i] ? bearCol : bullCol);
 			draw_list->AddLine(low_pos, high_pos, color);
 			draw_list->AddRectFilled(open_pos, close_pos, color);
+		}
+
+		// Sync DearPyGui show state with ImPlot internal state (before EndItem)
+		ImPlotItem* plotItem = ImPlot::GetCurrentItem();
+		if (plotItem) {
+			item.config.show = plotItem->Show;
 		}
 
 		// end plot item
@@ -1105,6 +1111,12 @@ DearPyGui::draw_line_series(ImDrawList* drawlist, mvAppItem& item, const mvLineS
 		yptr = &(*config.value.get())[1];
 
 		ImPlot::PlotLine(item.info.internalLabel.c_str(), xptr->data(), yptr->data(), (int)xptr->size(), config.flags);
+
+		// Update ImPlot visibility state for get_item_configuration()
+		ImPlotItem* plotItem = ImPlot::GetItem(item.info.internalLabel.c_str());
+		if (plotItem) {
+			item.config.implot_show = plotItem->Show;
+		}
 
 		// Begin a popup for a legend entry.
 		if (ImPlot::BeginLegendPopup(item.info.internalLabel.c_str(), 1))
@@ -2166,7 +2178,7 @@ DearPyGui::draw_candle_series(ImDrawList* drawlist, mvAppItem& item, const mvCan
 
 		PlotCandlestick(item.info.internalLabel.c_str(), datesptr->data(), openptr->data(), closeptr->data(),
 			lowptr->data(), highptr->data(), (int)datesptr->size(), config.tooltip, config.weight, config.bullColor,
-			config.bearColor, config.timeunit);
+			config.bearColor, config.timeunit, item);
 
 		// Begin a popup for a legend entry.
 		if (ImPlot::BeginLegendPopup(item.info.internalLabel.c_str(), 1))
@@ -2346,6 +2358,12 @@ DearPyGui::draw_custom_series(ImDrawList* drawlist, mvAppItem& item, mvCustomSer
 				UpdateAppItemState(child->state);
 			}
 			ImPlot::GetCurrentContext()->CurrentPlot = currentPlot;
+
+			// Sync DearPyGui show state with ImPlot internal state (before EndItem)
+			ImPlotItem* plotItem = ImPlot::GetCurrentItem();
+			if (plotItem) {
+				item.config.show = plotItem->Show;
+			}
 
 			// end plot item
 			ImPlot::EndItem();

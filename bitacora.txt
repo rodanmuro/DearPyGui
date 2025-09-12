@@ -1,0 +1,146 @@
+================================================================================
+BITÁCORA: Corrección del Bug de Legend Sync en DearPyGui
+================================================================================
+
+PROBLEMA INICIAL:
+-----------------
+En DearPyGui, cuando se hace clic en la leyenda de un plot para ocultar una serie 
+(line series), el comportamiento es inconsistente:
+- VISUAL: La serie se oculta correctamente
+- LEYENDA: Debería ponerse más clara (grayed out) pero seguir visible para poder hacer clic de nuevo
+- API: dpg.get_item_configuration("serie")["show"] sigue devolviendo True (BUG)
+
+El comportamiento esperado es que get_item_configuration()["show"] devuelva False cuando 
+la serie está oculta, pero que la leyenda siga visible para poder hacer clic y mostrarla otra vez.
+
+ANÁLISIS DEL PROBLEMA:
+----------------------
+1. ImPlot maneja internamente la visibilidad de series cuando se hace clic en la leyenda
+2. DearPyGui no sincroniza este estado interno con su propio item.config.show
+3. La función get_item_configuration() solo consulta item.config.show, no el estado de ImPlot
+
+ARCHIVOS INVESTIGADOS/MODIFICADOS:
+---------------------------------
+1. src/mvPlotting.cpp - Funciones de rendering de series
+   - draw_line_series() línea ~1113
+   - draw_candle_series() línea ~2173  
+   - draw_custom_series() línea ~2256
+
+2. src/dearpygui_commands.h - Implementación de get_item_configuration()
+   - Función get_item_configuration() línea ~3731
+
+3. src/mvAppItem.h - Estructuras de configuración
+   - mvAppItemConfig estructura línea ~112
+
+4. src/dearpygui.cpp - Inicialización del módulo
+   - PyInit__dearpygui() para debug counters
+
+5. thirdparty/implot/implot_internal.h - Headers de ImPlot
+   - Búsqueda de ImPlotItem estructura y funciones
+
+ENFOQUES INTENTADOS Y PROBLEMAS:
+--------------------------------
+
+ENFOQUE 1: Sincronización durante rendering
+-------------------------------------------
+IMPLEMENTACIÓN:
+- Agregado código en draw_line_series() después de ImPlot::PlotLine()
+- Consulta ImPlot::GetCurrentItem()->Show
+- Actualización de item.config.show = plotItem->Show
+
+ARCHIVOS MODIFICADOS:
+- src/mvPlotting.cpp líneas 1115-1119
+
+PROBLEMA ENCONTRADO:
+- Cuando item.config.show = false, la leyenda también desaparece completamente
+- No se puede hacer clic para mostrar la serie de nuevo
+- Comportamiento visual incorrecto (leyenda debe mantenerse visible)
+
+ENFOQUE 2: Interceptar get_item_configuration()
+----------------------------------------------
+IMPLEMENTACIÓN:
+- Modificar get_item_configuration() para consultar ImPlot directamente
+- Solo para mvLineSeries, consultar ImPlot::GetItem() en tiempo real
+- Mantener item.config.show intacto para preservar leyenda
+
+ARCHIVOS MODIFICADOS:
+- src/dearpygui_commands.h líneas 3754-3770
+- Agregado #include "implot_internal.h"
+
+PROBLEMA ENCONTRADO:
+- Segmentation fault al ejecutar
+- ImPlot::GetItem() no es seguro fuera del contexto de rendering
+- ImPlot::GetCurrentContext() puede ser nullptr
+
+ENFOQUE 3: Campo separado implot_show
+------------------------------------
+IMPLEMENTACIÓN:
+- Agregado campo bool implot_show a mvAppItemConfig
+- Actualización durante draw_line_series() de item.config.implot_show
+- get_item_configuration() retorna implot_show en lugar de show para line series
+
+ARCHIVOS MODIFICADOS:
+- src/mvAppItem.h línea 125: bool implot_show = true;
+- src/mvPlotting.cpp líneas 1115-1119: actualización de implot_show
+- src/dearpygui_commands.h líneas 3754-3759: uso de implot_show
+
+ESTADO ACTUAL: Compilado pero no probado completamente
+
+PROBLEMAS TÉCNICOS ENCONTRADOS:
+-------------------------------
+1. SEGMENTATION FAULTS:
+   - Llamar ImPlot::GetItem() fuera del contexto de rendering
+   - ImPlot::GetCurrentContext() nullptr en momentos inesperados
+
+2. COMPORTAMIENTO DE LEYENDA:
+   - ImPlot automáticamente oculta entradas de leyenda cuando item está oculto
+   - Modificar item.config.show afecta tanto la serie como la leyenda
+
+3. CONTEXTO DE EJECUCIÓN:
+   - get_item_configuration() se puede llamar en cualquier momento
+   - draw_line_series() solo se ejecuta durante rendering
+   - Necesidad de sincronización segura entre estos contextos
+
+4. COMPILACIÓN/TESTING:
+   - Dificultades para configurar DearSandbox (falta pyconfig.h)
+   - Problemas con paths de Python para testing directo
+   - Workflow de wheel rebuild es lento para iteración
+
+VERSIONES COMPILADAS:
+--------------------
+- Versión 005: Primer intento de sincronización
+- Versión 006: Intento de mantener leyenda visible  
+- Versión 007: Safety checks agregados
+- Versión 008: Force legend always visible
+- Versión 009: Safe ImPlot query only
+- Versión 010: Separated implot_show field (ACTUAL)
+
+ESTADO ACTUAL:
+--------------
+- El enfoque 3 (campo implot_show separado) está implementado y compilado
+- Necesita testing para verificar si funciona correctamente
+- La solución teóricamente debería:
+  * Mantener item.config.show = true (leyenda visible)
+  * Actualizar item.config.implot_show durante rendering
+  * Retornar implot_show en get_item_configuration() para line series
+
+PRÓXIMOS PASOS SUGERIDOS:
+------------------------
+1. Probar la versión 010 con el enfoque de campo separado
+2. Si funciona, extender a otros tipos de series (scatter, bar, etc.)
+3. Considerar agregar configuración para controlar este comportamiento
+4. Documentar la nueva funcionalidad
+
+LECCIONES APRENDIDAS:
+--------------------
+1. ImPlot maneja la visibilidad de manera compleja e interna
+2. La sincronización entre ImPlot y DearPyGui requiere cuidado especial
+3. El timing de las llamadas a funciones de ImPlot es crítico
+4. Los cambios en item.config.show afectan múltiples aspectos del rendering
+5. Es necesario un workflow de testing más eficiente para desarrollo iterativo
+
+================================================================================
+Fecha: 2025-09-12
+Autor: Claude Code Assistant
+Estado: En progreso - Versión 010 lista para testing
+================================================================================
