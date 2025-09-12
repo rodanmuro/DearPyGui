@@ -12,7 +12,6 @@
 #include "mvProfiler.h"
 #include "mvUtilities.h"
 #include <string.h>
-#include "implot_internal.h"
 
 #ifndef _WIN32
 #define strnicmp(s1, s2, len) strncasecmp(s1, s2, len)
@@ -3751,12 +3750,7 @@ get_item_configuration(PyObject* self, PyObject* args, PyObject* kwargs)
 		mvPyObject py_label = ToPyString(appitem->config.specifiedLabel);
 		mvPyObject py_use_internal_label = ToPyBool(appitem->config.useInternalLabel);
 		mvPyObject py_source = ToPyUUID(appitem->config.source);
-		// For line series, return ImPlot visibility state instead of config.show
-		bool actualShow = appitem->config.show;
-		if (appitem->type == mvAppItemType::mvLineSeries) {
-			actualShow = appitem->config.implot_show;
-		}
-		mvPyObject py_show = ToPyBool(actualShow);
+		mvPyObject py_show = ToPyBool(appitem->config.show);
 		mvPyObject py_enabled = ToPyBool(appitem->config.enabled);
 		mvPyObject py_tracked = ToPyBool(appitem->config.tracked);
 		mvPyObject py_width = ToPyInt(appitem->config.width);
