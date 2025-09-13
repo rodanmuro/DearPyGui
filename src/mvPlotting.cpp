@@ -1,4 +1,5 @@
 #include "mvPlotting.h"
+#include <implot_internal.h>
 #include <utility>
 #include "mvCore.h"
 #include "mvContext.h"
@@ -1104,7 +1105,11 @@ DearPyGui::draw_line_series(ImDrawList* drawlist, mvAppItem& item, const mvLineS
 		xptr = &(*config.value.get())[0];
 		yptr = &(*config.value.get())[1];
 
-		ImPlot::PlotLine(item.info.internalLabel.c_str(), xptr->data(), yptr->data(), (int)xptr->size(), config.flags);
+        ImPlot::PlotLine(item.info.internalLabel.c_str(), xptr->data(), yptr->data(), (int)xptr->size(), config.flags);
+
+        // Sync ImPlot internal visibility (legend toggle) to DPG config field
+        if (ImPlotItem* plotItem = ImPlot::GetItem(item.info.internalLabel.c_str()))
+            item.config.implot_show = plotItem->Show;
 
 		// Begin a popup for a legend entry.
 		if (ImPlot::BeginLegendPopup(item.info.internalLabel.c_str(), 1))

@@ -3803,7 +3803,17 @@ get_item_configuration(PyObject* self, PyObject* args, PyObject* kwargs)
 		else
 			PyDict_SetItemString(pdict, "user_data", GetPyNone());
 
-		appitem->getSpecificConfiguration(pdict);
+        appitem->getSpecificConfiguration(pdict);
+
+        // For ImPlot line series, reflect ImPlot's internal visibility (legend toggle)
+        // by overriding the reported "show" with config.implot_show.
+        // This makes is_item_shown() consistent with legend clicks for line series.
+        if (appitem->type == mvAppItemType::mvLineSeries) {
+            // Combine structural visibility (DPG show) with ImPlot internal show
+            // If item is hidden via configure_item(show=False), report False regardless of ImPlot state
+            bool effective_show = appitem->config.show && appitem->config.implot_show;
+            PyDict_SetItemString(pdict, "show", mvPyObject(ToPyBool(effective_show)));
+        }
 	}
 	else
 		mvThrowPythonError(mvErrorCode::mvItemNotFound, "get_item_configuration",
