@@ -43,6 +43,7 @@ void FillAppItemState  (PyObject* dict, mvAppItemState& state, i32 applicableSta
 void ResetAppItemState (mvAppItemState& state);                                      // reset values to false
 void UpdateAppItemState(mvAppItemState& state);                                      // standard imgui update
 void UpdatePlotAxisState(mvAppItemState& state, int axisId);                         // specialized update for plot axes
+void UpdatePlotState(mvAppItemState& state);                                         // specialized update for plots
 
 // return actual value if frame is active
 b8 IsItemHovered             (mvAppItemState& state, i32 frameDelay = 0);

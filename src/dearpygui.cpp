@@ -683,6 +683,8 @@ PyInit__dearpygui(void)
 	MV_ADD_COMMAND(get_item_types);
 	MV_ADD_COMMAND(get_item_configuration);
 	MV_ADD_COMMAND(get_item_state);
+	MV_ADD_COMMAND(is_plot_hovered);
+	MV_ADD_COMMAND(is_axis_hovered);
 	MV_ADD_COMMAND(configure_item);
 	MV_ADD_COMMAND(get_value);
 	MV_ADD_COMMAND(get_values);

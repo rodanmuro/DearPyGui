@@ -31,7 +31,7 @@ UpdateAppItemState(mvAppItemState& state)
     state.hovered = ImGui::IsItemHovered();
     state.active = ImGui::IsItemActive();
     state.focused = ImGui::IsItemFocused();
-    if (state.focused)
+    if (state.focused && state.parent)
     {
         GContext->focusedItem = state.parent->uuid;
     }
@@ -64,13 +64,17 @@ UpdatePlotAxisState(mvAppItemState& state, int axisId)
     state.lastFrameUpdate = GContext->frame;
     
     // Use ImPlot::IsAxisHovered for axis-specific hover detection
-    state.hovered = ImPlot::IsAxisHovered(axisId);
+    // Only call this if we have a valid ImPlot context and we're inside a plot
+    if (ImPlot::GetCurrentContext() != nullptr && ImPlot::GetCurrentPlot() != nullptr)
+        state.hovered = ImPlot::IsAxisHovered(axisId);
+    else
+        state.hovered = ImGui::IsItemHovered();
     
     // For other states, we use standard ImGui functions since axes don't have
     // special active/focused/clicked behavior in ImPlot
     state.active = ImGui::IsItemActive();
     state.focused = ImGui::IsItemFocused();
-    if (state.focused)
+    if (state.focused && state.parent)
     {
         GContext->focusedItem = state.parent->uuid;
     }
@@ -97,7 +101,49 @@ UpdatePlotAxisState(mvAppItemState& state, int axisId)
     state.mvPrevRectSize = state.rectSize;
 }
 
-void 
+void
+UpdatePlotState(mvAppItemState& state)
+{
+    state.lastFrameUpdate = GContext->frame;
+
+    // Use ImPlot::IsPlotHovered for plot-specific hover detection
+    // Only call this if we have a valid ImPlot context and we're inside a plot
+    if (ImPlot::GetCurrentContext() != nullptr && ImPlot::GetCurrentPlot() != nullptr)
+        state.hovered = ImPlot::IsPlotHovered();
+    else
+        state.hovered = ImGui::IsItemHovered();
+
+    // For other states, we use standard ImGui functions
+    state.active = ImGui::IsItemActive();
+    state.focused = ImGui::IsItemFocused();
+    if (state.focused && state.parent)
+    {
+        GContext->focusedItem = state.parent->uuid;
+    }
+    state.leftclicked = ImGui::IsItemClicked();
+    state.rightclicked = ImGui::IsItemClicked(1);
+    state.middleclicked = ImGui::IsItemClicked(2);
+    for (int i = 0; i < state.doubleclicked.size(); i++)
+    {
+        state.doubleclicked[i] = IsItemDoubleClicked(i);
+    }
+    state.visible = ImGui::IsItemVisible();
+    state.edited = ImGui::IsItemEdited();
+    state.activated = ImGui::IsItemActivated();
+    state.deactivated = ImGui::IsItemDeactivated();
+    state.deactivatedAfterEdit = ImGui::IsItemDeactivatedAfterEdit();
+    state.toggledOpen = ImGui::IsItemToggledOpen();
+    state.rectMin = { ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y };
+    state.rectMax = { ImGui::GetItemRectMax().x, ImGui::GetItemRectMax().y };
+    state.rectSize = { ImGui::GetItemRectSize().x, ImGui::GetItemRectSize().y };
+    state.contextRegionAvail = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
+
+    if (state.mvPrevRectSize.x != state.rectSize.x || state.mvPrevRectSize.y != state.rectSize.y) { state.mvRectSizeResized = true; }
+    else state.mvRectSizeResized = false;
+    state.mvPrevRectSize = state.rectSize;
+}
+
+void
 FillAppItemState(PyObject* dict, mvAppItemState& state, i32 applicableState)
 {
     if (dict == nullptr)

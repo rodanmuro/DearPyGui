@@ -899,6 +899,14 @@ def get_item_state(item : Union[int, str]) -> dict:
 	"""Returns an item's state."""
 	...
 
+def is_plot_hovered(item : Union[int, str]) -> bool:
+	"""Checks if plot is hovered."""
+	...
+
+def is_axis_hovered(item : Union[int, str]) -> bool:
+	"""Checks if plot axis is hovered."""
+	...
+
 def get_item_types() -> dict:
 	"""Returns an item types."""
 	...

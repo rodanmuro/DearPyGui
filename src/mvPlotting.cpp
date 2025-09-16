@@ -668,7 +668,7 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 
 	ImPlot::GetInputMap() = config._originalMap;
 
-	UpdateAppItemState(item.state);
+	UpdatePlotState(item.state);
 
 	if (item.font)
 	{

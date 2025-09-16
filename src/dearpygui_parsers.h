@@ -1451,6 +1451,32 @@ InsertParser_Block3(std::map<std::string, mvPythonParser>& parsers)
 		args.push_back({ mvPyDataType::UUID, "item" });
 
 		mvPythonParserSetup setup;
+		setup.about = "Checks if a plot is currently hovered.";
+		setup.category = { "Plotting", "App Item Operations" };
+		setup.returnType = mvPyDataType::Bool;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "is_plot_hovered", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+		args.push_back({ mvPyDataType::UUID, "item" });
+
+		mvPythonParserSetup setup;
+		setup.about = "Checks if a plot axis is currently hovered.";
+		setup.category = { "Plotting", "App Item Operations" };
+		setup.returnType = mvPyDataType::Bool;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "is_axis_hovered", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+		args.push_back({ mvPyDataType::UUID, "item" });
+
+		mvPythonParserSetup setup;
 		setup.about = "Configures an item.";
 		setup.category = { "App Item Operations" };
 		setup.unspecifiedKwargs = true;

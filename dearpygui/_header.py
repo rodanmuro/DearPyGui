@@ -653,6 +653,24 @@ def is_item_hovered(item: Union[int, str]) -> Union[bool, None]:
     return internal_dpg.get_item_state(item)["hovered"]
 
 
+def is_plot_hovered(item: Union[int, str]) -> Union[bool, None]:
+    """Checks if plot is hovered.
+
+    Returns:
+        status as a bool
+    """
+    return internal_dpg.is_plot_hovered(item)
+
+
+def is_axis_hovered(item: Union[int, str]) -> Union[bool, None]:
+    """Checks if plot axis is hovered.
+
+    Returns:
+        status as a bool
+    """
+    return internal_dpg.is_axis_hovered(item)
+
+
 def is_item_active(item: Union[int, str]) -> Union[bool, None]:
     """Checks if item is active.
 

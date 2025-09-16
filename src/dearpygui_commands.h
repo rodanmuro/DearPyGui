@@ -1,4 +1,5 @@
 #include "mvAppItemCommons.h"
+#include "mvPlotting.h"
 #include "mvFontManager.h"
 #include "mvItemRegistry.h"
 #include <ImGuiFileDialog.h>
@@ -4076,6 +4077,72 @@ get_item_state(PyObject* self, PyObject* args, PyObject* kwargs)
 			"Item not found: " + std::to_string(item), nullptr);
 
 	return pdict;
+}
+
+static PyObject*
+is_plot_hovered(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	PyObject* itemraw;
+
+	if (!Parse((GetParsers())["is_plot_hovered"], args, kwargs, __FUNCTION__, &itemraw))
+		return GetPyNone();
+
+	 std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
+
+	mvUUID item = GetIDFromPyObject(itemraw);
+	mvAppItem* appitem = GetItem((*GContext->itemRegistry), item);
+
+	if (appitem)
+	{
+		if (appitem->type != mvAppItemType::mvPlot)
+		{
+			mvThrowPythonError(mvErrorCode::mvIncompatibleType, "is_plot_hovered",
+				"Incompatible type. Expected types include: mvPlot", appitem);
+			return GetPyNone();
+		}
+
+		// Return the plot's cached hover state
+		return ToPyBool(appitem->state.hovered);
+	}
+	else
+	{
+		mvThrowPythonError(mvErrorCode::mvItemNotFound, "is_plot_hovered",
+			"Item not found: " + std::to_string(item), nullptr);
+		return GetPyNone();
+	}
+}
+
+static PyObject*
+is_axis_hovered(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	PyObject* itemraw;
+
+	if (!Parse((GetParsers())["is_axis_hovered"], args, kwargs, __FUNCTION__, &itemraw))
+		return GetPyNone();
+
+	 std::lock_guard<std::recursive_mutex> lk(GContext->mutex);
+
+	mvUUID item = GetIDFromPyObject(itemraw);
+	mvAppItem* appitem = GetItem((*GContext->itemRegistry), item);
+
+	if (appitem)
+	{
+		if (appitem->type != mvAppItemType::mvPlotAxis)
+		{
+			mvThrowPythonError(mvErrorCode::mvIncompatibleType, "is_axis_hovered",
+				"Incompatible type. Expected types include: mvPlotAxis", appitem);
+			return GetPyNone();
+		}
+
+		// Return the axis's cached hover state
+		return ToPyBool(appitem->state.hovered);
+	}
+	else
+	{
+		mvThrowPythonError(mvErrorCode::mvItemNotFound, "is_axis_hovered",
+			"Item not found: " + std::to_string(item), nullptr);
+		return GetPyNone();
+	}
 }
 
 static PyObject*
