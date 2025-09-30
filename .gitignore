@@ -20,3 +20,5 @@ thirdparty/CMakeFiles/
 thirdparty/Makefile
 thirdparty/cmake_install.cmake
 test
+/examples
+imgui.ini
