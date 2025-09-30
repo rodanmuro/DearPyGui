@@ -360,3 +360,94 @@ void mvRunCallback(PyObject* callable, mvUUID sender, PyObject* app_data, PyObje
 	}
 
 }
+
+bool mvRunCloseCallback(PyObject* callable, PyObject* user_data)
+{
+	if (callable == nullptr)
+		return true; // Allow close if no callback
+
+	if (!PyCallable_Check(callable))
+	{
+		if (user_data != nullptr)
+			Py_XDECREF(user_data);
+		mvThrowPythonError(mvErrorCode::mvNone, "Close callback not callable.");
+		PyErr_Print();
+		return true; // Allow close on error
+	}
+
+	if (user_data == nullptr)
+	{
+		user_data = Py_None;
+		Py_XINCREF(user_data);
+	}
+	Py_XINCREF(user_data);
+
+	// Clear any previous errors
+	if (PyErr_Occurred())
+		PyErr_Print();
+
+	// Check callback argument count
+	PyObject* fc = PyObject_GetAttrString(callable, "__code__");
+	if (fc) {
+		PyObject* ac = PyObject_GetAttrString(fc, "co_argcount");
+		if (ac) {
+			i32 count = PyLong_AsLong(ac);
+
+			if (PyMethod_Check(callable))
+				count--;
+
+			PyObject* result = nullptr;
+
+			// Call the callback with appropriate arguments
+			if (count >= 1)
+			{
+				mvPyObject pArgs(PyTuple_New(1));
+				PyTuple_SetItem(pArgs, 0, user_data); // steals reference
+
+				result = PyObject_CallObject(callable, pArgs);
+			}
+			else
+			{
+				result = PyObject_CallObject(callable, nullptr);
+				// Need to decref user_data since it wasn't stolen
+				Py_XDECREF(user_data);
+			}
+
+			Py_DECREF(ac);
+			Py_DECREF(fc);
+
+			// Check if call succeeded
+			if (result == nullptr)
+			{
+				PyErr_Print();
+				return true; // Allow close on error
+			}
+
+			// Check the return value
+			PyObject* ret = result;
+			bool shouldClose = true; // Default behavior: allow close
+
+			if (ret != nullptr && ret != Py_None)
+			{
+				// If the callback returns a boolean, use it
+				if (PyBool_Check(ret))
+				{
+					shouldClose = (ret == Py_True);
+				}
+				// If it returns an integer, treat 0 as False, non-zero as True
+				else if (PyLong_Check(ret))
+				{
+					shouldClose = (PyLong_AsLong(ret) != 0);
+				}
+			}
+
+			// Clean up the result
+			Py_XDECREF(result);
+			return shouldClose;
+		}
+		Py_DECREF(fc);
+	}
+
+	// Default: allow close
+	return true;
+}

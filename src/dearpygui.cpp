@@ -592,6 +592,11 @@ PyInit__dearpygui(void)
 	MV_ADD_COMMAND(set_style_colors_dark);
 	MV_ADD_COMMAND(toggle_style_colors);
 
+	// close request handling
+	MV_ADD_COMMAND(is_close_requested);
+	MV_ADD_COMMAND(confirm_close);
+	MV_ADD_COMMAND(cancel_close);
+
 	// tools
 	MV_ADD_COMMAND(show_tool);
 

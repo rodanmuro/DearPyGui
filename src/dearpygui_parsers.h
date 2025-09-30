@@ -2029,4 +2029,40 @@ InsertParser_Block4(std::map<std::string, mvPythonParser>& parsers)
 		mvPythonParser parser = FinalizeParser(setup, args);
 		parsers.insert({ "toggle_style_colors", parser });
 	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Returns True if a close was requested (when using disable_close=True).";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::Bool;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "is_close_requested", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Confirms the close request and exits the application.";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::None;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "confirm_close", parser });
+	}
+
+	{
+		std::vector<mvPythonDataElement> args;
+
+		mvPythonParserSetup setup;
+		setup.about = "Cancels the close request and keeps the application running.";
+		setup.category = { "General" };
+		setup.returnType = mvPyDataType::None;
+
+		mvPythonParser parser = FinalizeParser(setup, args);
+		parsers.insert({ "cancel_close", parser });
+	}
 }

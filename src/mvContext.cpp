@@ -231,6 +231,21 @@ Render()
 
     if (GContext->waitOneFrame == true)
         GContext->waitOneFrame = false;
+
+    // Handle close request with callback
+    if (GContext->closeRequested)
+    {
+        // Execute the exit callback to notify the user
+        if (GContext->callbackRegistry->onCloseCallback != nullptr)
+        {
+            mvSubmitCallback([=]() {
+                mvRunCallback(GContext->callbackRegistry->onCloseCallback, 0, nullptr, GContext->callbackRegistry->onCloseCallbackUserData);
+            });
+        }
+
+        // Note: We don't reset closeRequested here - the user will handle it
+        // The user can check is_close_requested() and call confirm_close() or cancel_close()
+    }
 }
 
 std::map<std::string, mvPythonParser>& 

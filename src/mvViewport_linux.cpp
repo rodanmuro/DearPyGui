@@ -21,9 +21,10 @@ static void
 window_close_callback(GLFWwindow* window)
 {
     if (GContext->viewport->disableClose) {
-        mvSubmitCallback([=]() {
-            mvRunCallback(GContext->callbackRegistry->onCloseCallback, 0, nullptr, GContext->callbackRegistry->onCloseCallbackUserData);
-            });
+        // Cancel the immediate close
+        glfwSetWindowShouldClose(window, GLFW_FALSE);
+        // Mark that a close was requested - will be handled in main loop
+        GContext->closeRequested = true;
     }
     else {
         GContext->started = false;

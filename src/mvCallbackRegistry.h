@@ -235,6 +235,7 @@ void mvFrameCallback(i32 frame);
 void mvRunTasks();
 void mvRunCallback(PyObject* callback, mvUUID sender, PyObject* app_data, PyObject* user_data, bool decrementAppData = true);
 void mvRunCallback(PyObject* callback, const std::string& sender, PyObject* app_data, PyObject* user_data);
+bool mvRunCloseCallback(PyObject* callback, PyObject* user_data);
 void mvAddCallback(PyObject* callback, mvUUID sender, PyObject* app_data, PyObject* user_data, bool decrementAppData = true);
 void mvAddCallback(PyObject* callback, const std::string& sender, PyObject* app_data, PyObject* user_data);
 bool mvRunCallbacks();

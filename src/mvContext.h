@@ -105,6 +105,7 @@ struct mvContext
 {
     std::atomic_bool    waitOneFrame       = false;
     std::atomic_bool    started            = false;
+    std::atomic_bool    closeRequested     = false; // Flag for close confirmation
     std::recursive_mutex mutex;
     std::future<bool>   future;
     float               deltaTime = 0.0f;   // time since last frame

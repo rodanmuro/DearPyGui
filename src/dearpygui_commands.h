@@ -4440,3 +4440,35 @@ toggle_style_colors(PyObject* self, PyObject* args, PyObject* kwargs)
 
 	return GetPyNone();
 }
+
+static PyObject*
+is_close_requested(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["is_close_requested"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	return ToPyBool(GContext->closeRequested);
+}
+
+static PyObject*
+confirm_close(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["confirm_close"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	GContext->closeRequested = false;
+	GContext->started = false;
+
+	return GetPyNone();
+}
+
+static PyObject*
+cancel_close(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	if (!Parse((GetParsers())["cancel_close"], args, kwargs, __FUNCTION__))
+		return GetPyNone();
+
+	GContext->closeRequested = false;
+
+	return GetPyNone();
+}

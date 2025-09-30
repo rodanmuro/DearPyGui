@@ -276,10 +276,9 @@ mvHandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 		break;
 	case WM_CLOSE:
 		if (GContext->viewport->disableClose) {
-			mvSubmitCallback([=]() {
-				mvRunCallback(GContext->callbackRegistry->onCloseCallback, 0, nullptr, GContext->callbackRegistry->onCloseCallbackUserData);
-				});
-			return 0;
+			// Mark that a close was requested - will be handled in main loop
+			GContext->closeRequested = true;
+			return 0; // Prevent immediate close
 		}
 		GContext->started = false;
 		DestroyWindow(hWnd);

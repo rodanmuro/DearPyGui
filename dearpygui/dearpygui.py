@@ -9495,16 +9495,47 @@ def set_clipboard_text(text : str, **kwargs) -> None:
 	return internal_dpg.set_clipboard_text(text, **kwargs)
 
 def set_exit_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
-	"""	 Sets a callback to run on last frame.
+	"""	 Sets a callback to run when the application is about to close.
+
+	When the viewport has disable_close=True, this callback can control whether
+	the application actually closes by returning True (allow close) or False (prevent close).
 
 	Args:
-		callback (Callable): 
+		callback (Callable): Function to call on close attempt. Can return True/False to allow/prevent closing.
 		user_data (Any, optional): New in 1.3. Optional user data to send to the callback
 	Returns:
 		str
 	"""
 
 	return internal_dpg.set_exit_callback(callback, user_data=user_data, **kwargs)
+
+def is_close_requested(**kwargs) -> bool:
+	"""	 Returns True if a close was requested (when using disable_close=True).
+
+	Use this in your main loop to check if the user tried to close the window.
+	Call confirm_close() to allow the close or cancel_close() to prevent it.
+
+	Returns:
+		bool: True if close was requested
+	"""
+
+	return internal_dpg.is_close_requested(**kwargs)
+
+def confirm_close(**kwargs) -> None:
+	"""	 Confirms the close request and exits the application.
+
+	Call this after is_close_requested() returns True to actually close the app.
+	"""
+
+	return internal_dpg.confirm_close(**kwargs)
+
+def cancel_close(**kwargs) -> None:
+	"""	 Cancels the close request and keeps the application running.
+
+	Call this after is_close_requested() returns True to prevent closing.
+	"""
+
+	return internal_dpg.cancel_close(**kwargs)
 
 def set_frame_callback(frame : int, callback : Callable, *, user_data: Any =None, **kwargs) -> str:
 	"""	 Sets a callback to run on first frame.
