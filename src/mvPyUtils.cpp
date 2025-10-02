@@ -512,6 +512,16 @@ ToPyInt(int value)
 PyObject*
 ToPyUUID(mvAppItem* item)
 {
+    // VALIDACIÓN: Verificar que el puntero no sea nullptr
+    if (item == nullptr)
+        return Py_BuildValue("K", (unsigned long long)0);
+
+    // VALIDACIÓN CRÍTICA: Verificar que el item todavía exista en el registry global
+    // Esto previene access violations cuando callbacks se ejecutan después de eliminar items
+    mvAppItem* validItem = GetItem(*GContext->itemRegistry, item->uuid);
+    if (validItem == nullptr || validItem != item)
+        return Py_BuildValue("K", (unsigned long long)0);
+
     if (!item->config.alias.empty())
         return Py_BuildValue("K", item->uuid);
 

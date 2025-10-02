@@ -348,12 +348,25 @@ void mvHoverHandler::customAction(void* data)
 	mvAppItemState* state = static_cast<mvAppItemState*>(data);
 	if (state->hovered)
 	{
+		// CRÍTICO: Capturar el UUID en lugar del puntero para evitar dangling pointer
+		// cuando el callback se ejecuta después de que el item fue eliminado
+		mvUUID parentUUID = (state->parent != nullptr) ? state->parent->uuid : 0;
+		mvUUID handlerUUID = uuid;
+		std::string aliasCapture = config.alias;
+		PyObject* userDataCapture = config.user_data;
+		PyObject* callbackCapture = getCallback(false);
+
 		mvSubmitCallback([=]()
 			{
-				if (config.alias.empty())
-					mvRunCallback(getCallback(false), uuid, ToPyUUID(state->parent), config.user_data);
+				// VALIDACIÓN: Verificar que el handler todavía existe antes de ejecutar callback
+				// Esto previene crashes cuando el handler fue eliminado mientras el callback estaba encolado
+				if (GetItem(*GContext->itemRegistry, handlerUUID) == nullptr)
+					return;
+
+				if (aliasCapture.empty())
+					mvRunCallback(callbackCapture, handlerUUID, ToPyUUID(parentUUID), userDataCapture);
 				else
-					mvRunCallback(getCallback(false), config.alias, ToPyUUID(state->parent), config.user_data);
+					mvRunCallback(callbackCapture, aliasCapture, ToPyUUID(parentUUID), userDataCapture);
 			});
 	}
 }
